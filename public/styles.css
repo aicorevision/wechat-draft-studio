@@ -6,7 +6,7 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 1080px; min-height: 720px; }
-button, input, textarea { font: inherit; }
+button, input, textarea, select { font: inherit; }
 button {
   align-items: center; border: 1px solid #d8d1c1; border-radius: 7px; background: #fffdf8;
   color: #26231f; cursor: pointer; display: inline-flex; gap: 8px; justify-content: center;
@@ -14,11 +14,13 @@ button {
 }
 button:hover:not(:disabled) { background: #f3efe5; border-color: #b9ad99; }
 button:disabled { cursor: not-allowed; opacity: 0.55; }
-input, textarea {
+input, textarea, select {
   border: 1px solid #d7cfbe; border-radius: 7px; background: #fffefa; color: #24211d;
   outline: none; padding: 10px 11px; width: 100%;
 }
-input:focus, textarea:focus, .editor:focus { border-color: #3e7a71; box-shadow: 0 0 0 3px rgba(62, 122, 113, 0.15); }
+input:focus, textarea:focus, select:focus, .editor:focus {
+  border-color: #3e7a71; box-shadow: 0 0 0 3px rgba(62, 122, 113, 0.15);
+}
 label { color: #676052; display: grid; gap: 7px; font-size: 13px; font-weight: 650; }
 .app { display: grid; grid-template-rows: 72px minmax(0, 1fr); height: 100vh; }
 .topbar { align-items: center; border-bottom: 1px solid #ded6c5; display: flex; justify-content: space-between; padding: 0 22px; }
@@ -26,9 +28,9 @@ label { color: #676052; display: grid; gap: 7px; font-size: 13px; font-weight: 6
 .topbar p { color: #7b7467; font-size: 13px; margin: 3px 0 0; }
 .toolbar { display: flex; gap: 8px; }
 .toolbar button, .formatbar button, .cover-row button { aspect-ratio: 1; padding: 0; width: 38px; }
-.workspace { display: grid; grid-template-columns: 308px minmax(460px, 1fr) 320px; min-height: 0; }
+.workspace { display: grid; grid-template-columns: 320px minmax(480px, 1fr) 340px; min-height: 0; }
 .drafts, .inspector { background: #efeadf; min-height: 0; padding: 16px; }
-.drafts { border-right: 1px solid #ded6c5; display: grid; gap: 12px; grid-template-rows: auto minmax(0, 1fr) auto; }
+.drafts { border-right: 1px solid #ded6c5; display: grid; gap: 12px; grid-template-rows: auto auto minmax(0, 1fr) auto; }
 .inspector { border-left: 1px solid #ded6c5; display: flex; flex-direction: column; gap: 15px; overflow: auto; }
 .panel-title { align-items: baseline; display: flex; justify-content: space-between; }
 .panel-title small, .draft-row small { color: #857d6f; }
@@ -40,33 +42,49 @@ label { color: #676052; display: grid; gap: 7px; font-size: 13px; font-weight: 6
 .draft-row strong { font-size: 14px; line-height: 1.35; }
 .draft-row span { color: #625c51; font-size: 12px; line-height: 1.45; }
 .draft-row.active { background: #dfeee9; border-color: #77a69c; }
-.pager, .modal-actions { display: flex; gap: 8px; }
-.pager button { flex: 1; }
-.editor-wrap { display: grid; gap: 12px; grid-template-rows: auto auto auto minmax(0, 1fr); min-height: 0; padding: 18px; }
+.pager, .modal-actions, .ai-buttons { display: flex; gap: 8px; }
+.pager button, .ai-buttons button { flex: 1; }
+.editor-wrap {
+  display: grid; gap: 12px; grid-template-rows: auto auto auto minmax(0, 1fr);
+  min-height: 0; padding: 18px;
+}
 .tabs { display: flex; gap: 8px; min-height: 0; overflow-x: auto; }
 .tabs:empty { display: none; }
 .tabs button { white-space: nowrap; }
-.tabs button.selected { background: #263b37; border-color: #263b37; color: #fff; }
+.tabs button.selected, #sourceBtn.selected { background: #263b37; border-color: #263b37; color: #fff; }
 .title-input {
   border: 0; border-bottom: 1px solid #d8d1c1; border-radius: 0; box-shadow: none;
   font-size: 28px; font-weight: 760; letter-spacing: 0; padding: 8px 2px 12px;
 }
 .formatbar { align-items: center; display: flex; gap: 8px; }
-.editor {
+#sourceBtn { aspect-ratio: auto; width: auto; padding: 0 10px; }
+.editor, .source-editor {
   background: #fffefa; border: 1px solid #ded6c5; border-radius: 8px; line-height: 1.75;
   min-height: 0; overflow: auto; padding: 30px 34px;
 }
+.source-editor { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; resize: none; }
 .editor h1, .editor h2, .editor h3 { letter-spacing: 0; line-height: 1.35; }
 .editor h2 { border-left: 4px solid #3e7a71; padding-left: 12px; }
 .editor img { border-radius: 6px; display: block; height: auto; margin: 18px auto; max-width: 100%; }
 .editor figure { margin: 22px 0; }
 .editor figcaption { color: #746d61; font-size: 13px; text-align: center; }
+.stats { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+.stats span {
+  background: #fffefa; border: 1px solid #d8d1c1; border-radius: 7px; color: #5f584d;
+  font-size: 13px; padding: 9px 10px; text-align: center;
+}
 .inspector textarea { min-height: 92px; resize: vertical; }
 .cover-row { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr) 38px; }
 .toggles { display: grid; gap: 8px; }
 .toggles label { align-items: center; display: flex; flex-direction: row; font-weight: 600; }
 .toggles input { width: auto; }
-.actions { border-top: 1px solid #d8d1c1; display: grid; gap: 9px; margin-top: 4px; padding-top: 15px; }
+.ai-panel {
+  border-top: 1px solid #d8d1c1; border-bottom: 1px solid #d8d1c1;
+  display: grid; gap: 9px; padding: 14px 0;
+}
+.ai-panel strong { color: #3f3930; }
+#aiResult { min-height: 110px; }
+.actions { display: grid; gap: 9px; margin-top: 4px; }
 .actions button { justify-content: flex-start; width: 100%; }
 .primary { background: #2f6f66; border-color: #2f6f66; color: #fff; }
 .primary:hover:not(:disabled) { background: #285f57; border-color: #285f57; }
@@ -76,7 +94,11 @@ label { color: #676052; display: grid; gap: 7px; font-size: 13px; font-weight: 6
   font-size: 12px; line-height: 1.45; margin-top: auto; min-height: 42px; padding: 10px; word-break: break-word;
 }
 .modal-backdrop { align-items: center; background: rgba(32, 29, 24, 0.38); display: flex; inset: 0; justify-content: center; position: fixed; }
-.modal { background: #fffefa; border: 1px solid #d8d1c1; border-radius: 8px; box-shadow: 0 20px 80px rgba(40,34,24,.22); display: grid; gap: 14px; padding: 22px; width: min(480px, calc(100vw - 40px)); }
+.modal {
+  background: #fffefa; border: 1px solid #d8d1c1; border-radius: 8px;
+  box-shadow: 0 20px 80px rgba(40,34,24,.22); display: grid; gap: 14px;
+  padding: 22px; width: min(480px, calc(100vw - 40px));
+}
 .modal h2 { font-size: 20px; margin: 0; }
 .modal p { color: #675f52; line-height: 1.5; margin: 0; }
 .modal-actions { justify-content: flex-end; }

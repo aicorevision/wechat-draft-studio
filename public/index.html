@@ -3,84 +3,108 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>WeChat Draft Studio</title>
+    <title>微信公众号草稿工作台</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="app">
       <header class="topbar">
         <div>
-          <h1>WeChat Draft Studio</h1>
-          <p id="connection">Checking credentials</p>
+          <h1>微信公众号草稿工作台</h1>
+          <p id="connection">正在检查配置</p>
         </div>
         <div class="toolbar">
-          <button id="refreshBtn" title="Refresh">↻</button>
-          <button id="settingsBtn" title="Settings">⚙</button>
+          <button id="healthBtn" title="检查连接">✓</button>
+          <button id="refreshBtn" title="刷新草稿">↻</button>
+          <button id="settingsBtn" title="设置">⚙</button>
         </div>
       </header>
 
       <main class="workspace">
         <aside class="drafts">
           <div class="panel-title">
-            <strong>Draft Box</strong>
-            <small id="totalCount">0 total</small>
+            <strong>草稿箱</strong>
+            <small id="totalCount">共 0 篇</small>
           </div>
+          <input id="searchInput" placeholder="搜索标题、摘要或正文" />
           <div id="draftList" class="draft-list"></div>
           <div class="pager">
-            <button id="prevBtn">Prev</button>
-            <button id="nextBtn">Next</button>
+            <button id="prevBtn">上一页</button>
+            <button id="nextBtn">下一页</button>
           </div>
         </aside>
 
         <section class="editor-wrap">
           <div id="articleTabs" class="tabs"></div>
-          <input id="titleInput" class="title-input" placeholder="Title" />
+          <input id="titleInput" class="title-input" placeholder="请输入标题" maxlength="64" />
           <div class="formatbar">
-            <button data-cmd="bold" title="Bold"><b>B</b></button>
-            <button data-cmd="italic" title="Italic"><i>I</i></button>
-            <button data-block="h2" title="Heading">H2</button>
-            <button data-cmd="insertUnorderedList" title="List">•</button>
-            <button id="imageBtn" title="Insert image">▧</button>
+            <button data-cmd="bold" title="加粗"><b>B</b></button>
+            <button data-cmd="italic" title="斜体"><i>I</i></button>
+            <button data-block="h2" title="二级标题">H2</button>
+            <button data-cmd="insertUnorderedList" title="无序列表">•</button>
+            <button id="imageBtn" title="插入正文图片">▧</button>
+            <button id="sourceBtn" title="源码编辑">HTML</button>
             <input id="imageInput" type="file" accept="image/*" hidden />
           </div>
           <article id="editor" class="editor" contenteditable="true"></article>
+          <textarea id="sourceEditor" class="source-editor hidden" spellcheck="false"></textarea>
         </section>
 
         <aside class="inspector">
-          <label>Author<input id="authorInput" placeholder="Author" /></label>
-          <label>Digest<textarea id="digestInput" maxlength="120" placeholder="Short summary"></textarea></label>
-          <label>Source URL<input id="sourceInput" placeholder="https://..." /></label>
+          <div class="stats">
+            <span id="wordCount">0 字</span>
+            <span id="imageCount">0 图</span>
+          </div>
+          <label>作者<input id="authorInput" placeholder="作者，最多 16 字" maxlength="16" /></label>
+          <label>摘要<textarea id="digestInput" maxlength="120" placeholder="摘要，最多 120 字"></textarea></label>
+          <label>原文链接<input id="sourceInput" placeholder="https://..." /></label>
           <label>
-            Cover
+            封面
             <div class="cover-row">
-              <input id="coverInfo" readonly placeholder="Upload a cover or keep existing media id" />
-              <button id="coverBtn" title="Upload cover">↑</button>
+              <input id="coverInfo" readonly placeholder="上传封面或保留原 thumb_media_id" />
+              <button id="coverBtn" title="上传封面">↑</button>
               <input id="coverInput" type="file" accept="image/*" hidden />
             </div>
           </label>
           <div class="toggles">
-            <label><input id="commentInput" type="checkbox" checked /> Open comments</label>
-            <label><input id="fansInput" type="checkbox" /> Fans only</label>
+            <label><input id="commentInput" type="checkbox" checked /> 开启留言</label>
+            <label><input id="fansInput" type="checkbox" /> 仅粉丝可留言</label>
+          </div>
+          <div class="ai-panel">
+            <strong>AI 辅助</strong>
+            <select id="aiAction">
+              <option value="polish">润色选中内容</option>
+              <option value="shorten">压缩选中内容</option>
+              <option value="expand">扩写选中内容</option>
+              <option value="title">生成标题建议</option>
+              <option value="summary">生成摘要建议</option>
+              <option value="structure">检查文章结构</option>
+            </select>
+            <div class="ai-buttons">
+              <button id="aiBtn">执行</button>
+              <button id="applyAiBtn" disabled>应用结果</button>
+            </div>
+            <textarea id="aiResult" readonly placeholder="AI 结果会显示在这里"></textarea>
           </div>
           <div class="actions">
-            <button id="updateBtn" class="primary">Update Draft</button>
-            <button id="addBtn">Upload as New</button>
-            <button id="deleteBtn" class="danger">Delete Draft</button>
+            <button id="updateBtn" class="primary">更新当前草稿</button>
+            <button id="addBtn">上传为新草稿</button>
+            <button id="deleteBtn" class="danger">删除当前草稿</button>
           </div>
-          <div id="status" class="status">Ready</div>
+          <div id="status" class="status">就绪</div>
         </aside>
       </main>
     </div>
 
     <div id="settingsModal" class="modal-backdrop hidden">
       <section class="modal">
-        <h2>Settings</h2>
-        <p>Credentials stay in this running local process. For persistent use, create a local .env file.</p>
-        <label>App ID<input id="appIdInput" placeholder="WECHAT_APP_ID" /></label>
-        <label>App Secret<input id="appSecretInput" type="password" placeholder="WECHAT_APP_SECRET" /></label>
+        <h2>设置</h2>
+        <p>凭据只保存在当前本地进程中。长期使用请写入本工具目录下的本地 .env 文件。</p>
+        <label>AppID<input id="appIdInput" placeholder="WECHAT_APP_ID" /></label>
+        <label>AppSecret<input id="appSecretInput" type="password" placeholder="WECHAT_APP_SECRET" /></label>
         <div class="modal-actions">
-          <button id="cancelSettingsBtn">Cancel</button>
-          <button id="saveSettingsBtn" class="primary">Save</button>
+          <button id="cancelSettingsBtn">取消</button>
+          <button id="saveSettingsBtn" class="primary">保存</button>
         </div>
       </section>
     </div>

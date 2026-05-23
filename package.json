@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/server.mjs",
-    "check": "node --check scripts/server.mjs"
+    "check": "node --check scripts/server.mjs && node --check public/app.js && node --check scripts/smoke-test.mjs",
+    "smoke": "node scripts/smoke-test.mjs"
   }
 }

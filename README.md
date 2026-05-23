@@ -1,57 +1,104 @@
-# WeChat Draft Studio
+# 微信公众号草稿工作台
 
-Cross-platform local Web GUI for managing WeChat Official Account draft-box articles.
+一个独立的本地 Web GUI，用来读取、修改、删除和上传微信公众号草稿箱文章。它不依赖任何文章生成 Skill，只直接调用微信公众号官方草稿箱 API。
 
-It is intentionally independent from any article-writing Skill. It talks to the WeChat Official Account draft APIs directly and only needs your local AppID/AppSecret at runtime.
+## 功能
 
-## Features
+- 读取草稿箱列表，支持分页和本页搜索。
+- 打开指定草稿，编辑标题、作者、摘要、原文链接、留言设置和正文。
+- 支持富文本编辑和 HTML 源码编辑切换。
+- 上传正文图片到 `media/uploadimg` 并插入正文。
+- 上传封面图到 `material/add_material` 并写入 `thumb_media_id`。
+- 更新已有草稿，更新前自动保存本地快照。
+- 上传当前内容为新草稿。
+- 删除草稿，删除前要求输入“删除”，并自动保存本地快照。
+- AI 辅助润色、压缩、扩写、标题建议、摘要建议和结构检查。
 
-- List draft-box articles.
-- Open a selected draft and edit its title, metadata and rich HTML body visually.
-- Insert local body images; images are uploaded with `media/uploadimg` when selected.
-- Choose a local cover image; it is uploaded with `material/add_material`.
-- Update an existing draft with `draft/update`.
-- Upload the current article as a new draft with `draft/add`.
-- Delete a selected draft with `draft/delete`.
+## 运行要求
 
-## Requirements
+- Node.js 22 或更新版本。
+- 已认证且具备草稿箱接口权限的微信公众号。
+- 当前机器出口 IP 已加入微信公众号后台 API 白名单。
 
-- Node.js 22 or newer. No npm dependencies are required.
-- A WeChat Official Account with developer credentials and draft-box API permission.
-- Your current public IP must be in the account API whitelist.
-
-## Setup
+## 本地配置
 
 ```bash
 cd tools/wechat-draft-studio
 cp .env.example .env
 ```
 
-Fill `.env` locally:
+在本地 `.env` 写入：
 
 ```bash
-WECHAT_APP_ID=your-app-id
-WECHAT_APP_SECRET=your-app-secret
+WECHAT_APP_ID=你的 AppID
+WECHAT_APP_SECRET=你的 AppSecret
 ```
 
-You can also enter credentials in the Settings dialog. Runtime-entered credentials are kept only in the running local process.
+`.env` 已被 `.gitignore` 忽略，不要提交。
 
-## Run
+## 启动
 
 ```bash
 npm start
 ```
 
-Then open:
+打开：
 
 ```text
 http://127.0.0.1:4178
 ```
 
-On Windows, run the same commands in PowerShell or Windows Terminal.
+Windows、macOS、Linux 都使用同一套命令。
 
-## Notes
+## AI 配置
 
-- This app does not store secrets in the repository.
-- Updating a normal `news` draft requires a `thumb_media_id`. If the original draft already has one, the app keeps it; otherwise choose a cover image.
-- Official WeChat endpoints used by this tool include `/cgi-bin/draft/batchget`, `/cgi-bin/draft/get`, `/cgi-bin/draft/update`, `/cgi-bin/draft/delete`, `/cgi-bin/draft/add`, `/cgi-bin/media/uploadimg`, and `/cgi-bin/material/add_material`.
+默认使用 OpenAI 兼容接口，适合接 APINK 或其他中转网关：
+
+```bash
+WECHAT_DRAFT_AI_MODE=openai-compatible
+WECHAT_DRAFT_AI_BASE_URL=https://你的网关/v1
+WECHAT_DRAFT_AI_API_KEY=你的 AI Key
+WECHAT_DRAFT_AI_MODEL=你的模型名
+```
+
+也可以接本地命令，例如 `codex` 或 `claude` 的 CLI 包装脚本：
+
+```bash
+WECHAT_DRAFT_AI_MODE=command
+WECHAT_DRAFT_AI_COMMAND=/path/to/your-ai-command
+```
+
+命令模式会从 stdin 收到 JSON：
+
+```json
+{"action":"polish","text":"...","prompt":"..."}
+```
+
+stdout 返回润色结果即可。
+
+## 验证
+
+语法检查：
+
+```bash
+npm run check
+```
+
+真实接口烟测会创建一个测试草稿、上传图片、更新、读取列表，最后删除测试草稿：
+
+```bash
+npm start
+npm run smoke
+```
+
+烟测只删除它自己创建的测试草稿。
+
+## 本地数据
+
+更新和删除前的快照保存在：
+
+```text
+.local/snapshots/
+```
+
+该目录已被忽略，不会提交到仓库。
