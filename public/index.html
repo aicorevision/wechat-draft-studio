@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WeChat Draft Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div>
+          <h1>WeChat Draft Studio</h1>
+          <p id="connection">Checking credentials</p>
+        </div>
+        <div class="toolbar">
+          <button id="refreshBtn" title="Refresh">↻</button>
+          <button id="settingsBtn" title="Settings">⚙</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="drafts">
+          <div class="panel-title">
+            <strong>Draft Box</strong>
+            <small id="totalCount">0 total</small>
+          </div>
+          <div id="draftList" class="draft-list"></div>
+          <div class="pager">
+            <button id="prevBtn">Prev</button>
+            <button id="nextBtn">Next</button>
+          </div>
+        </aside>
+
+        <section class="editor-wrap">
+          <div id="articleTabs" class="tabs"></div>
+          <input id="titleInput" class="title-input" placeholder="Title" />
+          <div class="formatbar">
+            <button data-cmd="bold" title="Bold"><b>B</b></button>
+            <button data-cmd="italic" title="Italic"><i>I</i></button>
+            <button data-block="h2" title="Heading">H2</button>
+            <button data-cmd="insertUnorderedList" title="List">•</button>
+            <button id="imageBtn" title="Insert image">▧</button>
+            <input id="imageInput" type="file" accept="image/*" hidden />
+          </div>
+          <article id="editor" class="editor" contenteditable="true"></article>
+        </section>
+
+        <aside class="inspector">
+          <label>Author<input id="authorInput" placeholder="Author" /></label>
+          <label>Digest<textarea id="digestInput" maxlength="120" placeholder="Short summary"></textarea></label>
+          <label>Source URL<input id="sourceInput" placeholder="https://..." /></label>
+          <label>
+            Cover
+            <div class="cover-row">
+              <input id="coverInfo" readonly placeholder="Upload a cover or keep existing media id" />
+              <button id="coverBtn" title="Upload cover">↑</button>
+              <input id="coverInput" type="file" accept="image/*" hidden />
+            </div>
+          </label>
+          <div class="toggles">
+            <label><input id="commentInput" type="checkbox" checked /> Open comments</label>
+            <label><input id="fansInput" type="checkbox" /> Fans only</label>
+          </div>
+          <div class="actions">
+            <button id="updateBtn" class="primary">Update Draft</button>
+            <button id="addBtn">Upload as New</button>
+            <button id="deleteBtn" class="danger">Delete Draft</button>
+          </div>
+          <div id="status" class="status">Ready</div>
+        </aside>
+      </main>
+    </div>
+
+    <div id="settingsModal" class="modal-backdrop hidden">
+      <section class="modal">
+        <h2>Settings</h2>
+        <p>Credentials stay in this running local process. For persistent use, create a local .env file.</p>
+        <label>App ID<input id="appIdInput" placeholder="WECHAT_APP_ID" /></label>
+        <label>App Secret<input id="appSecretInput" type="password" placeholder="WECHAT_APP_SECRET" /></label>
+        <div class="modal-actions">
+          <button id="cancelSettingsBtn">Cancel</button>
+          <button id="saveSettingsBtn" class="primary">Save</button>
+        </div>
+      </section>
+    </div>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

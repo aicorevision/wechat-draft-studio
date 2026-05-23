@@ -1,0 +1,11 @@
+{
+  "name": "wechat-draft-studio",
+  "version": "0.1.0",
+  "description": "Cross-platform local Web GUI for managing WeChat Official Account drafts.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/server.mjs",
+    "check": "node --check scripts/server.mjs"
+  }
+}
