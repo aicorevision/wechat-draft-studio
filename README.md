@@ -1,104 +1,133 @@
-# 微信公众号草稿工作台
+# WeChat Draft Studio
 
-一个独立的本地 Web GUI，用来读取、修改、删除和上传微信公众号草稿箱文章。它不依赖任何文章生成 Skill，只直接调用微信公众号官方草稿箱 API。
+A local web workspace for managing WeChat Official Account drafts without logging into the browser editor for every small change.
 
-## 功能
+It reads, edits, uploads, updates, and deletes drafts through the official WeChat draft APIs. The app runs on your own machine, keeps credentials local, and saves snapshots before risky operations.
 
-- 读取草稿箱列表，支持分页和本页搜索。
-- 打开指定草稿，编辑标题、作者、摘要、原文链接、留言设置和正文。
-- 支持富文本编辑和 HTML 源码编辑切换。
-- 上传正文图片到 `media/uploadimg` 并插入正文。
-- 上传封面图到 `material/add_material` 并写入 `thumb_media_id`。
-- 更新已有草稿，更新前自动保存本地快照。
-- 上传当前内容为新草稿。
-- 删除草稿，删除前要求输入“删除”，并自动保存本地快照。
-- AI 辅助润色、压缩、扩写、标题建议、摘要建议和结构检查。
+[![Node.js](https://img.shields.io/badge/Node.js-22%2B-green)](#requirements)
+[![WeChat API](https://img.shields.io/badge/WeChat-Draft%20API-blue)](#requirements)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 运行要求
+## Why This Exists
 
-- Node.js 22 或更新版本。
-- 已认证且具备草稿箱接口权限的微信公众号。
-- 当前机器出口 IP 已加入微信公众号后台 API 白名单。
+The official editor is fine for publishing, but it is not always pleasant for repeated draft maintenance: copying HTML, updating summaries, swapping covers, checking old drafts, or making a quick structured edit.
 
-## 本地配置
+WeChat Draft Studio keeps that work in a small local tool:
+
+- Credentials stay in environment variables or a local `.env`.
+- The browser UI is focused on draft operations, not content marketing dashboards.
+- Updates and deletes create local snapshots first.
+- AI assistance is optional and can use either an OpenAI-compatible API or a local command.
+
+## Features
+
+- List Official Account drafts with pagination and page search.
+- Open an existing draft and edit title, author, digest, source URL, comment setting, and body.
+- Switch between rich text editing and raw HTML source.
+- Upload inline images through `media/uploadimg`.
+- Upload cover images through `material/add_material`.
+- Update existing drafts with a local snapshot before writing.
+- Create a new draft from the current editor content.
+- Delete drafts with a typed confirmation and snapshot.
+- Optional AI actions: polish, shorten, expand, title ideas, summaries, and structure review.
+
+## Requirements
+
+- Node.js 22 or newer.
+- A verified WeChat Official Account with draft API access.
+- Your current outbound IP added to the WeChat API allowlist.
+
+## Quick Start
 
 ```bash
-cd tools/wechat-draft-studio
+git clone https://github.com/aicorevision/wechat-draft-studio.git
+cd wechat-draft-studio
+npm install
 cp .env.example .env
 ```
 
-在本地 `.env` 写入：
+Fill `.env` locally:
 
 ```bash
-WECHAT_APP_ID=你的 AppID
-WECHAT_APP_SECRET=你的 AppSecret
+WECHAT_APP_ID=your-app-id
+WECHAT_APP_SECRET=your-app-secret
 ```
 
-`.env` 已被 `.gitignore` 忽略，不要提交。
-
-## 启动
+Start the app:
 
 ```bash
 npm start
 ```
 
-打开：
+Open:
 
 ```text
 http://127.0.0.1:4178
 ```
 
-Windows、macOS、Linux 都使用同一套命令。
+## AI Configuration
 
-## AI 配置
-
-默认使用 OpenAI 兼容接口，适合接 APINK 或其他中转网关：
+OpenAI-compatible mode:
 
 ```bash
 WECHAT_DRAFT_AI_MODE=openai-compatible
-WECHAT_DRAFT_AI_BASE_URL=https://你的网关/v1
-WECHAT_DRAFT_AI_API_KEY=你的 AI Key
-WECHAT_DRAFT_AI_MODEL=你的模型名
+WECHAT_DRAFT_AI_BASE_URL=https://your-gateway.example/v1
+WECHAT_DRAFT_AI_API_KEY=your-api-key
+WECHAT_DRAFT_AI_MODEL=your-model-name
 ```
 
-也可以接本地命令，例如 `codex` 或 `claude` 的 CLI 包装脚本：
+Command mode:
 
 ```bash
 WECHAT_DRAFT_AI_MODE=command
 WECHAT_DRAFT_AI_COMMAND=/path/to/your-ai-command
 ```
 
-命令模式会从 stdin 收到 JSON：
+Command mode receives JSON on stdin:
 
 ```json
 {"action":"polish","text":"...","prompt":"..."}
 ```
 
-stdout 返回润色结果即可。
+It should print the edited result to stdout.
 
-## 验证
+## Local Data
 
-语法检查：
+Snapshots are written to:
+
+```text
+.local/snapshots/
+```
+
+This directory is ignored by git. It is there so that accidental updates or deletes are easier to recover from.
+
+## Useful Commands
 
 ```bash
 npm run check
 ```
 
-真实接口烟测会创建一个测试草稿、上传图片、更新、读取列表，最后删除测试草稿：
+Run a syntax check.
 
 ```bash
 npm start
 npm run smoke
 ```
 
-烟测只删除它自己创建的测试草稿。
+Run the real API smoke test. It creates a temporary test draft, uploads an image, updates the draft, reads the list, and deletes only the test draft it created.
 
-## 本地数据
+## Security Notes
 
-更新和删除前的快照保存在：
+- Never commit `.env`.
+- Prefer environment variables or `~/.wechat-draft-studio/.env` for credentials.
+- Do not run the app on a public interface unless you add your own access control.
+- API permissions belong to your Official Account; review WeChat API access before using smoke tests.
 
-```text
-.local/snapshots/
-```
+## Star If Useful
 
-该目录已被忽略，不会提交到仓库。
+If this saves you a few trips through the Official Account editor, a star helps other WeChat operators and technical writers find it.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
+
